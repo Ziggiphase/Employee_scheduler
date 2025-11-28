@@ -9,11 +9,19 @@ from sklearn.pipeline import make_pipeline
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="AI Scheduler Enterprise", page_icon="📅", layout="wide")
 
-# --- 1. SETUP & ML TRAINING (70+ Data Points) ---
+# --- 1. SETUP & ML TRAINING ---
 @st.cache_resource
 def load_resources():
     # A. Load NLP Model
-    nlp = spacy.load("en_core_web_sm")
+    # The model is installed via requirements.txt, so we just load it.
+    try:
+        nlp = spacy.load("en_core_web_sm")
+    except OSError:
+        # Fallback: Download if not found (useful for local dev)
+        from spacy.cli import download
+        download("en_core_web_sm")
+        nlp = spacy.load("en_core_web_sm")
+
     matcher = Matcher(nlp.vocab)
     
     # Define Pattern for Time (e.g., 3-11, 9:00-5:00)
